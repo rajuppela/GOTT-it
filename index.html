@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gott it!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+      body {
+        background-image: url(./bg.jpeg);
+        background-size: cover;
+      }
+        #home, #display-screen, #hidden-options {
+            position: relative;
+            top: 100px;
+            display: none;
+        }
+        #display-screen {
+            display: grid;
+            grid-template-columns: 25% 25% 25%;
+            justify-content: center;
+            align-items: center;
+            row-gap: 10px;
+            column-gap: 10px;
+        }
+        #showSelection {
+          background-color: burlywood;
+          margin-left: 25px;
+        }
+        .card {
+          background-color: cornsilk;
+        }
+        .card h5 {
+          color: red;
+
+        }
+        .card li {
+          color: blue;
+        }
+        .card:hover {
+          scale: 1.03;
+          border: 1px solid crimson;
+        }
+        @media screen and (max-width:480px) {
+            #display-screen {
+              margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#home" style = "color: ghostwhite; font-family: URW Chancery L, cursive;font-size: 36px;">G<b style= "color: chartreuse;">OTT</b> it!</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Movies, TV Shows & More</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#home" onclick="refresh()">Home</a>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Streaming Services
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                      <li><a class="dropdown-item" href="#" onclick="netflixContent()">Netflix</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="primeContent()">Prime Video</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="appleContent()">Apple TV</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="mubiContent()">MUBI</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="hotstarContent()">Hotstar</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="zee5Content()">Zee5</a></li>
+                    </ul>
+                  </li>
+              </ul>
+              <form class="d-flex mt-3" role="search">
+                <input class="form-control me-2" type="text" placeholder="Search movie/series" aria-label="Search">
+                <input class="btn btn-success" type="submit" value="search"></input>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="home">
+        <h2 style="text-align: center; margin-top: 25px;color: white;">One-stop solution for all your streaming-availability queries.</h2>
+      </div>
+      <div id="hidden-options">
+        <select id="showSelection" onchange="netflixmoviesContent()">
+          <option value="all">All</option>
+          <option value="movie">Movies</option>
+          <option value="series">Series</option>
+        </select>
+      </div>
+      <div id="display-screen">
+      </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        var home = document.getElementById('home');
+        var displayScreen = document.getElementById('display-screen');
+        var pre = 'https://streaming-availability.p.rapidapi.com/search/title?title=';
+        var last = '&country=in&show_type=all&output_language=en';
+        var f = document.forms;
+        var unhide =  document.getElementById('hidden-options');
+
+        // Search
+        f[0].addEventListener('submit',function(e){
+            e.preventDefault();
+            var searchName = e.target[0].value;
+
+            fetch (pre+searchName+last,{ method: 'GET',
+	headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+	})
+    .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+        var lists = '';
+        
+for (let i=0; i<val.length;i++)
+{
+    lists += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Search Results</h2>`;
+displayScreen.innerHTML = lists;
+        })
+    })
+    var part1 = 'https://streaming-availability.p.rapidapi.com/search/filters?services=';
+    var part2 = '&country=in&output_language=en&order_by=original_title&genres_relation=and&show_type=all';
+
+    // Netflix
+    function netflixContent() {
+      unhide.style.display = 'block';
+      fetch(part1+'netflix'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Netflix</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Prime Video
+    function primeContent() {
+      unhide.style.display = 'block';
+      fetch(part1+'prime'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Prime Video</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    //Hotstar
+    function hotstarContent() {
+      unhide.style.display = 'block';
+      fetch(part1+'hotstar'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Hotstar</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    //Zee5
+    function zee5Content() {
+      unhide.style.display = 'block';
+      fetch(part1+'zee5'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Zee5</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Apple
+    function appleContent() {
+      unhide.style.display = 'block';
+      fetch(part1+'apple'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Apple TV</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Mubi
+    function mubiContent() {
+      unhide.style.display = 'block';
+      fetch(part1+'mubi'+part2, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Mubi</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    var l1 = 'https://streaming-availability.p.rapidapi.com/search/filters?services=';
+    var l3 = '&country=us&output_language=en&order_by=original_title&genres_relation=and&show_type=';
+    
+    // Netflix Show Type
+    function netflixmoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'netflix'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Netflix</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Prime Movies
+    function primemoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'prime'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Prime Video</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Hotstar Movies
+    function hotstarmoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'hotstar'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Hotstar</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Zee5 Movies
+    function zeemoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'zee5'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Zee5</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Apple TV Movies
+    function applemoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'apple'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Apple TV</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Mubi Movies
+    function mubimoviesContent() {
+      unhide.style.display = 'block';
+      var l4 = document.getElementById('showSelection').value;
+      fetch(l1+'mubi'+l3+l4, {
+        method: 'GET',
+        headers: {
+		'X-RapidAPI-Key': 'be082c340emsh9e40c1c7558df05p16b006jsn09ff1428818b',
+		'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'}
+      })
+      .then((val)=>{
+        return val.json();
+    })
+    .then((val)=>{
+        return val.result;
+    })
+    .then((val)=>{
+      var content = '';
+      
+      for (let i=0; i<val.length;i++)
+{
+    content += `<div class="card" style="width: 20rem; height: 22rem">
+  <div class="card-body">
+    <h5 class="card-title">${val[i].title}</h5>
+    <p class="card-text">Cast: ${val[i].cast[0]+',' + val[i].cast[1]}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Original Title: ${val[i].originalTitle}</li>
+    <li class="list-group-item">Type: ${val[i].type}</li>
+    <li class="list-group-item">Year: ${val[i].year}</li>
+    <li class="list-group-item">IMDB ID: ${val[i].imdbId}</li>
+  </ul>
+</div>`
+}
+home.innerHTML = `<h2 style="text-align: center; margin-top: 25px;color: white;">Mubi</h2>`;
+displayScreen.innerHTML = content;
+    })
+    }
+
+    // Refresh
+    function refresh() {
+      window.location.assign('./index.html');
+    }
+    </script>
+</body>
+</html>
